@@ -107,25 +107,29 @@ export default function CheckoutForm() {
   const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
+      const newState = { ...prev };
+      
+      // Handle payment method separately
       if (name === 'paymentMethod') {
-        const paymentValue = value as string;
-        if (paymentValue !== 'cod' && paymentValue !== 'razorpay') {
-          return prev;
+        if (value === 'cod' || value === 'razorpay') {
+          newState[name] = value;
         }
-        return { ...prev, [name]: paymentValue };
+        return newState;
       }
 
-      const newState = { ...prev, [name]: value };
+      // Handle other fields
+      newState[name as keyof typeof newState] = value;
       
       if (sameAsShipping) {
-        const billingField = name.replace('shipping', 'billing') as keyof CheckoutFormData;
-        newState[billingField] = value;
+        const billingField = name.replace('shipping', 'billing');
+        if (billingField !== name && billingField in newState) {
+          newState[billingField as keyof CheckoutFormData] = value;
+        }
       }
       
       return newState;
     });
-    validateField(name, value);
-  };
+    validateField(name, value);  };
 
   const handleCityInputChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'shipping' | 'billing') => {
     const { value } = e.target;
