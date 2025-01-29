@@ -19,8 +19,8 @@ export default function SearchPage() {
           </aside>
           
           <div className="w-full md:w-5/6">
-             {/* Wrapping SearchResults in Suspense for async fetching */}
-             <Suspense fallback={<div>Loading search results...</div>}>
+            {/* Wrapping SearchResults in Suspense for async fetching */}
+            <Suspense fallback={<div>Loading search results...</div>}>
               <SearchResults query={query} />
             </Suspense>
           </div>
@@ -90,7 +90,7 @@ function SearchResults({ query }: { query: string | null }) {
   }
 
   return (
-    <div className=" rounded-lg">
+    <div className="rounded-lg">
       <h1 className="text-xl font-semibold mb-8 text-gray-800">
         {products.length > 0
           ? `Search Results for "${query}"`

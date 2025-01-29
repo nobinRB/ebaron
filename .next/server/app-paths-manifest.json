@@ -5,5 +5,7 @@
   "/products/[id]/page": "app/products/[id]/page.js",
   "/shop/page": "app/shop/page.js",
   "/cart/page": "app/cart/page.js",
-  "/checkout/page": "app/checkout/page.js"
+  "/checkout/page": "app/checkout/page.js",
+  "/api/products/search/route": "app/api/products/search/route.js",
+  "/search/page": "app/search/page.js"
 }
