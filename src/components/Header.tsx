@@ -34,7 +34,7 @@ export default function Header() {
     const fetchSearchResults = async () => {
       if (debouncedSearch.trim()) {
         try {
-          const response = await fetch(`/api/products/search?q=${encodeURIComponent(debouncedSearch)}`);
+          const response = await fetch(`${process.env.BASE_URL}/api/products/search?q=${encodeURIComponent(debouncedSearch)}`);
           const data = await response.json();
           setSearchResults(data);
           setIsSearchOpen(true);

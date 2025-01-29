@@ -11,7 +11,7 @@ export default function ProductGrid() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch(`${process.env.BASE_URL}/api/products`);
         const data = await response.json();
         setProducts(data);
       } catch (error) {
