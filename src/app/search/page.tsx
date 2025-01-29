@@ -19,7 +19,8 @@ export default function SearchPage() {
           </aside>
           
           <div className="w-full md:w-5/6">
-            <Suspense fallback={<div>Loading search results...</div>}>
+             {/* Wrapping SearchResults in Suspense for async fetching */}
+             <Suspense fallback={<div>Loading search results...</div>}>
               <SearchResults query={query} />
             </Suspense>
           </div>
