@@ -1417,686 +1417,687 @@ function CheckoutForm() {
             }
             return newState;
         });
-        const handleCityInputChange = (e, type)=>{
-            const { value } = e.target;
-            const fieldPrefix = type === 'shipping' ? 'shipping' : 'billing';
-            setFormData((prev)=>({
-                    ...prev,
-                    [`${fieldPrefix}City`]: value
-                }));
-            if (formData[`${fieldPrefix}Country`] === 'IN') {
-                const suggestions = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$indianLocations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCitySuggestions"])(value);
-                setCitySuggestions(suggestions);
-                setShowSuggestions(true);
-            }
-        };
-        const handleCitySelect = (city, type)=>{
-            const fieldPrefix = type === 'shipping' ? 'shipping' : 'billing';
-            const state = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$indianLocations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getStateFromCity"])(city);
-            setFormData((prev)=>({
-                    ...prev,
-                    [`${fieldPrefix}City`]: city,
-                    [`${fieldPrefix}State`]: state || prev[`${fieldPrefix}State`]
-                }));
-            if (sameAsShipping && type === 'shipping') {
-                setFormData((prev)=>({
-                        ...prev,
-                        billingCity: city,
-                        billingState: state || prev.billingState
-                    }));
-            }
-            setShowSuggestions(false);
-            validateField(`${fieldPrefix}City`, city);
-            if (state) {
-                validateField(`${fieldPrefix}State`, state);
-            }
-        };
-        const handlePincodeChange = (e, type)=>{
-            const { value } = e.target;
-            const fieldPrefix = type === 'shipping' ? 'shipping' : 'billing';
-            setFormData((prev)=>({
-                    ...prev,
-                    [`${fieldPrefix}Pincode`]: value
-                }));
-            // Auto-populate city and state for Indian addresses
-            if (formData[`${fieldPrefix}Country`] === 'IN' && value.length === 6) {
-                const location = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$indianLocations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getLocationFromPincode"])(value);
-                if (location) {
-                    const newFormData = {
-                        ...formData,
-                        [`${fieldPrefix}City`]: location.city,
-                        [`${fieldPrefix}State`]: location.state,
-                        [`${fieldPrefix}Pincode`]: value
-                    };
-                    if (sameAsShipping && type === 'shipping') {
-                        newFormData.billingCity = location.city;
-                        newFormData.billingState = location.state;
-                        newFormData.billingPincode = value;
-                    }
-                    setFormData(newFormData);
-                    validateField(`${fieldPrefix}City`, location.city);
-                    validateField(`${fieldPrefix}State`, location.state);
-                    validateField(`${fieldPrefix}Pincode`, value);
-                }
-            }
-        };
-        const handleSubmit = async (e)=>{
-            e.preventDefault();
-            // Validate all fields
-            const validationErrors = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$validation$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["validateCheckoutForm"])(formData);
-            setErrors(validationErrors);
-            // Mark all fields as touched
-            const allTouched = Object.keys(formData).reduce((acc, key)=>{
-                acc[key] = true;
-                return acc;
-            }, {});
-            setTouched(allTouched);
-            // If there are any errors, don't submit
-            if (Object.keys(validationErrors).length > 0) {
-                return;
-            }
-            // Proceed with form submission
-            try {
-            // Your form submission logic here
-            } catch (error) {
-                console.error('Error submitting form:', error);
-            }
-        };
-        const getInputClassName = (fieldName)=>{
-            const baseClasses = "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-black";
-            const errorClasses = touched[fieldName] && errors[fieldName] ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-gray-200";
-            return `${baseClasses} ${errorClasses}`;
-        };
-        const handleRazorpayPayment = async ()=>{
-            try {
-                const options = {
-                    key: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-                    amount: 50000,
-                    currency: "INR",
-                    name: "Your Store Name",
-                    description: "Order Payment",
-                    handler: function(response) {
-                        console.log("Payment Success:", response);
-                    // Handle successful payment
-                    },
-                    prefill: {
-                        name: formData.shippingName,
-                        email: formData.shippingEmail,
-                        contact: formData.shippingPhone
-                    },
-                    theme: {
-                        color: "#111827" // matches bg-gray-900
-                    }
-                };
-                const paymentObject = new window.Razorpay(options);
-                paymentObject.open();
-            } catch (error) {
-                console.error("Payment failed:", error);
-            }
-        };
-        const handlePaymentMethodChange = (method)=>{
-            setFormData((prev)=>({
-                    ...prev,
-                    paymentMethod: method
-                }));
-        };
-        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-            onSubmit: handleSubmit,
-            className: "space-y-8",
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "space-y-6",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                            className: "text-xl font-semibold text-gray-900",
-                            children: "Shipping Address"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                            lineNumber: 283,
-                            columnNumber: 9
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid grid-cols-1 md:grid-cols-2 gap-4",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-gray-700 mb-1",
-                                            children: "Full Name"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 287,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            name: "shippingName",
-                                            value: formData.shippingName,
-                                            onChange: handleChange,
-                                            onBlur: handleBlur,
-                                            className: getInputClassName('shippingName'),
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 290,
-                                            columnNumber: 13
-                                        }, this),
-                                        touched.shippingName && errors.shippingName && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-sm text-red-500",
-                                            children: errors.shippingName
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 300,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 286,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-gray-700 mb-1",
-                                            children: "Email"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 304,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "email",
-                                            name: "shippingEmail",
-                                            value: formData.shippingEmail,
-                                            onChange: handleChange,
-                                            onBlur: handleBlur,
-                                            className: getInputClassName('shippingEmail'),
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 307,
-                                            columnNumber: 13
-                                        }, this),
-                                        touched.shippingEmail && errors.shippingEmail && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-sm text-red-500",
-                                            children: errors.shippingEmail
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 317,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 303,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "md:col-span-2",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-gray-700 mb-1",
-                                            children: "Phone"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 321,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "tel",
-                                            name: "shippingPhone",
-                                            value: formData.shippingPhone,
-                                            onChange: handleChange,
-                                            onBlur: handleBlur,
-                                            className: getInputClassName('shippingPhone'),
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 324,
-                                            columnNumber: 13
-                                        }, this),
-                                        touched.shippingPhone && errors.shippingPhone && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-sm text-red-500",
-                                            children: errors.shippingPhone
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 334,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 320,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "md:col-span-2",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-gray-700 mb-1",
-                                            children: "Address"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 338,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
-                                            name: "shippingAddress",
-                                            value: formData.shippingAddress,
-                                            onChange: handleChange,
-                                            onBlur: handleBlur,
-                                            rows: 3,
-                                            className: getInputClassName('shippingAddress'),
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 341,
-                                            columnNumber: 13
-                                        }, this),
-                                        touched.shippingAddress && errors.shippingAddress && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-sm text-red-500",
-                                            children: errors.shippingAddress
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 351,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 337,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-gray-700 mb-1",
-                                            children: "Country"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 355,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                            name: "shippingCountry",
-                                            value: formData.shippingCountry,
-                                            onChange: handleShippingChange,
-                                            className: getInputClassName('shippingCountry'),
-                                            required: true,
-                                            children: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$countries$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["countries"].map((country)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: country.code,
-                                                    children: country.name
-                                                }, country.code, false, {
-                                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                    lineNumber: 366,
-                                                    columnNumber: 17
-                                                }, this))
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 358,
-                                            columnNumber: 13
-                                        }, this),
-                                        touched.shippingCountry && errors.shippingCountry && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-sm text-red-500",
-                                            children: errors.shippingCountry
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 372,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 354,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "relative",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-gray-700 mb-1",
-                                            children: "City"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 376,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            name: "shippingCity",
-                                            value: formData.shippingCity,
-                                            onChange: (e)=>handleCityInputChange(e, 'shipping'),
-                                            onBlur: (e)=>{
-                                                setTimeout(()=>setShowSuggestions(false), 200);
-                                                handleBlur(e);
-                                            },
-                                            className: getInputClassName('shippingCity'),
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 379,
-                                            columnNumber: 13
-                                        }, this),
-                                        showSuggestions && formData.shippingCountry === 'IN' && citySuggestions.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
-                                            className: "absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto",
-                                            children: citySuggestions.map((city)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                                    className: "px-4 py-2 hover:bg-gray-100 cursor-pointer text-black",
-                                                    onClick: ()=>handleCitySelect(city, 'shipping'),
-                                                    children: city
-                                                }, city, false, {
-                                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                    lineNumber: 394,
-                                                    columnNumber: 19
-                                                }, this))
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 392,
-                                            columnNumber: 15
-                                        }, this),
-                                        touched.shippingCity && errors.shippingCity && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-sm text-red-500",
-                                            children: errors.shippingCity
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 405,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 375,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-gray-700 mb-1",
-                                            children: "State"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 409,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            name: "shippingState",
-                                            value: formData.shippingState,
-                                            onChange: handleShippingChange,
-                                            onBlur: handleBlur,
-                                            className: getInputClassName('shippingState'),
-                                            required: true,
-                                            readOnly: formData.shippingCountry === 'IN'
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 412,
-                                            columnNumber: 13
-                                        }, this),
-                                        touched.shippingState && errors.shippingState && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-sm text-red-500",
-                                            children: errors.shippingState
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 423,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 408,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-gray-700 mb-1",
-                                            children: "PIN Code"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 427,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            name: "shippingPincode",
-                                            value: formData.shippingPincode,
-                                            onChange: (e)=>handlePincodeChange(e, 'shipping'),
-                                            onBlur: handleBlur,
-                                            className: getInputClassName('shippingPincode'),
-                                            maxLength: 6,
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 430,
-                                            columnNumber: 13
-                                        }, this),
-                                        touched.shippingPincode && errors.shippingPincode && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-sm text-red-500",
-                                            children: errors.shippingPincode
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 441,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 426,
-                                    columnNumber: 11
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                            lineNumber: 285,
-                            columnNumber: 9
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                    lineNumber: 282,
-                    columnNumber: 7
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex items-center",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                            type: "checkbox",
-                            id: "sameAsShipping",
-                            checked: sameAsShipping,
-                            onChange: handleSameAsShippingChange,
-                            className: "h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                            lineNumber: 449,
-                            columnNumber: 9
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                            htmlFor: "sameAsShipping",
-                            className: "ml-2 text-sm text-gray-700",
-                            children: "Billing address same as shipping"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                            lineNumber: 456,
-                            columnNumber: 9
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                    lineNumber: 448,
-                    columnNumber: 7
-                }, this),
-                !sameAsShipping && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$checkout$2f$BillingAddressForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                    formData: formData,
-                    handleChange: handleChange,
-                    handleBlur: handleBlur,
-                    getInputClassName: getInputClassName,
-                    errors: errors,
-                    touched: touched
-                }, void 0, false, {
-                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                    lineNumber: 463,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "space-y-4",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "text-lg font-medium text-gray-900",
-                            children: "Payment Method"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                            lineNumber: 475,
-                            columnNumber: 9
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid grid-cols-1 md:grid-cols-2 gap-4",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "button",
-                                    onClick: ()=>handlePaymentMethodChange('cod'),
-                                    className: `flex items-center justify-between p-4 border rounded-lg ${formData.paymentMethod === 'cod' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`,
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "flex items-center gap-3",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$bi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BiMoney"], {
-                                                    className: "w-6 h-6 text-gray-700"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                    lineNumber: 489,
-                                                    columnNumber: 15
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "text-left",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "font-medium text-gray-900",
-                                                            children: "Cash on Delivery"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                            lineNumber: 491,
-                                                            columnNumber: 17
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "text-sm text-gray-500",
-                                                            children: "Extra ₹49 COD charges"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                            lineNumber: 492,
-                                                            columnNumber: 17
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                    lineNumber: 490,
-                                                    columnNumber: 15
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 488,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: `w-4 h-4 rounded-full border-2 ${formData.paymentMethod === 'cod' ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 495,
-                                            columnNumber: 13
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 479,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "button",
-                                    onClick: ()=>handlePaymentMethodChange('razorpay'),
-                                    className: `flex items-center justify-between p-4 border rounded-lg ${formData.paymentMethod === 'razorpay' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`,
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "flex items-center gap-3",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$fa6$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FaCreditCard"], {
-                                                    className: "w-6 h-6 text-gray-700"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                    lineNumber: 513,
-                                                    columnNumber: 15
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "text-left",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "font-medium text-gray-900",
-                                                            children: "Pay Online"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                            lineNumber: 515,
-                                                            columnNumber: 17
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "text-sm text-gray-500",
-                                                            children: "Cards, UPI, NetBanking"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                            lineNumber: 516,
-                                                            columnNumber: 17
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                                    lineNumber: 514,
-                                                    columnNumber: 15
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 512,
-                                            columnNumber: 13
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: `w-4 h-4 rounded-full border-2 ${formData.paymentMethod === 'razorpay' ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                            lineNumber: 519,
-                                            columnNumber: 13
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                                    lineNumber: 503,
-                                    columnNumber: 11
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                            lineNumber: 477,
-                            columnNumber: 9
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                    lineNumber: 474,
-                    columnNumber: 7
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                    type: "submit",
-                    className: "w-full bg-gray-900 text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors",
-                    children: formData.paymentMethod === 'cod' ? 'Place Order' : 'Proceed to Pay'
-                }, void 0, false, {
-                    fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-                    lineNumber: 529,
-                    columnNumber: 7
-                }, this)
-            ]
-        }, void 0, true, {
-            fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
-            lineNumber: 280,
-            columnNumber: 5
-        }, this);
+        validateField(name, value);
     };
+    const handleCityInputChange = (e, type)=>{
+        const { value } = e.target;
+        const fieldPrefix = type === 'shipping' ? 'shipping' : 'billing';
+        setFormData((prev)=>({
+                ...prev,
+                [`${fieldPrefix}City`]: value
+            }));
+        if (formData[`${fieldPrefix}Country`] === 'IN') {
+            const suggestions = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$indianLocations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCitySuggestions"])(value);
+            setCitySuggestions(suggestions);
+            setShowSuggestions(true);
+        }
+    };
+    const handleCitySelect = (city, type)=>{
+        const fieldPrefix = type === 'shipping' ? 'shipping' : 'billing';
+        const state = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$indianLocations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getStateFromCity"])(city);
+        setFormData((prev)=>({
+                ...prev,
+                [`${fieldPrefix}City`]: city,
+                [`${fieldPrefix}State`]: state || prev[`${fieldPrefix}State`]
+            }));
+        if (sameAsShipping && type === 'shipping') {
+            setFormData((prev)=>({
+                    ...prev,
+                    billingCity: city,
+                    billingState: state || prev.billingState
+                }));
+        }
+        setShowSuggestions(false);
+        validateField(`${fieldPrefix}City`, city);
+        if (state) {
+            validateField(`${fieldPrefix}State`, state);
+        }
+    };
+    const handlePincodeChange = (e, type)=>{
+        const { value } = e.target;
+        const fieldPrefix = type === 'shipping' ? 'shipping' : 'billing';
+        setFormData((prev)=>({
+                ...prev,
+                [`${fieldPrefix}Pincode`]: value
+            }));
+        // Auto-populate city and state for Indian addresses
+        if (formData[`${fieldPrefix}Country`] === 'IN' && value.length === 6) {
+            const location = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$indianLocations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getLocationFromPincode"])(value);
+            if (location) {
+                const newFormData = {
+                    ...formData,
+                    [`${fieldPrefix}City`]: location.city,
+                    [`${fieldPrefix}State`]: location.state,
+                    [`${fieldPrefix}Pincode`]: value
+                };
+                if (sameAsShipping && type === 'shipping') {
+                    newFormData.billingCity = location.city;
+                    newFormData.billingState = location.state;
+                    newFormData.billingPincode = value;
+                }
+                setFormData(newFormData);
+                validateField(`${fieldPrefix}City`, location.city);
+                validateField(`${fieldPrefix}State`, location.state);
+                validateField(`${fieldPrefix}Pincode`, value);
+            }
+        }
+    };
+    const handleSubmit = async (e)=>{
+        e.preventDefault();
+        // Validate all fields
+        const validationErrors = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$validation$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["validateCheckoutForm"])(formData);
+        setErrors(validationErrors);
+        // Mark all fields as touched
+        const allTouched = Object.keys(formData).reduce((acc, key)=>{
+            acc[key] = true;
+            return acc;
+        }, {});
+        setTouched(allTouched);
+        // If there are any errors, don't submit
+        if (Object.keys(validationErrors).length > 0) {
+            return;
+        }
+        // Proceed with form submission
+        try {
+        // Your form submission logic here
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        }
+    };
+    const getInputClassName = (fieldName)=>{
+        const baseClasses = "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-black";
+        const errorClasses = touched[fieldName] && errors[fieldName] ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-gray-200";
+        return `${baseClasses} ${errorClasses}`;
+    };
+    const handleRazorpayPayment = async ()=>{
+        try {
+            const options = {
+                key: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                amount: 50000,
+                currency: "INR",
+                name: "Your Store Name",
+                description: "Order Payment",
+                handler: function(response) {
+                    console.log("Payment Success:", response);
+                // Handle successful payment
+                },
+                prefill: {
+                    name: formData.shippingName,
+                    email: formData.shippingEmail,
+                    contact: formData.shippingPhone
+                },
+                theme: {
+                    color: "#111827" // matches bg-gray-900
+                }
+            };
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+        } catch (error) {
+            console.error("Payment failed:", error);
+        }
+    };
+    const handlePaymentMethodChange = (method)=>{
+        setFormData((prev)=>({
+                ...prev,
+                paymentMethod: method
+            }));
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+        onSubmit: handleSubmit,
+        className: "space-y-8",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "space-y-6",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                        className: "text-xl font-semibold text-gray-900",
+                        children: "Shipping Address"
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                        lineNumber: 284,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "Full Name"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 288,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "text",
+                                        name: "shippingName",
+                                        value: formData.shippingName,
+                                        onChange: handleChange,
+                                        onBlur: handleBlur,
+                                        className: getInputClassName('shippingName'),
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 291,
+                                        columnNumber: 13
+                                    }, this),
+                                    touched.shippingName && errors.shippingName && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-sm text-red-500",
+                                        children: errors.shippingName
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 301,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 287,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "Email"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 305,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "email",
+                                        name: "shippingEmail",
+                                        value: formData.shippingEmail,
+                                        onChange: handleChange,
+                                        onBlur: handleBlur,
+                                        className: getInputClassName('shippingEmail'),
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 308,
+                                        columnNumber: 13
+                                    }, this),
+                                    touched.shippingEmail && errors.shippingEmail && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-sm text-red-500",
+                                        children: errors.shippingEmail
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 318,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 304,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "md:col-span-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "Phone"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 322,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "tel",
+                                        name: "shippingPhone",
+                                        value: formData.shippingPhone,
+                                        onChange: handleChange,
+                                        onBlur: handleBlur,
+                                        className: getInputClassName('shippingPhone'),
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 325,
+                                        columnNumber: 13
+                                    }, this),
+                                    touched.shippingPhone && errors.shippingPhone && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-sm text-red-500",
+                                        children: errors.shippingPhone
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 335,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 321,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "md:col-span-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "Address"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 339,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
+                                        name: "shippingAddress",
+                                        value: formData.shippingAddress,
+                                        onChange: handleChange,
+                                        onBlur: handleBlur,
+                                        rows: 3,
+                                        className: getInputClassName('shippingAddress'),
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 342,
+                                        columnNumber: 13
+                                    }, this),
+                                    touched.shippingAddress && errors.shippingAddress && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-sm text-red-500",
+                                        children: errors.shippingAddress
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 352,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 338,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "Country"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 356,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                        name: "shippingCountry",
+                                        value: formData.shippingCountry,
+                                        onChange: handleShippingChange,
+                                        className: getInputClassName('shippingCountry'),
+                                        required: true,
+                                        children: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$countries$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["countries"].map((country)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: country.code,
+                                                children: country.name
+                                            }, country.code, false, {
+                                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                lineNumber: 367,
+                                                columnNumber: 17
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 359,
+                                        columnNumber: 13
+                                    }, this),
+                                    touched.shippingCountry && errors.shippingCountry && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-sm text-red-500",
+                                        children: errors.shippingCountry
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 373,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 355,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "relative",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "City"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 377,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "text",
+                                        name: "shippingCity",
+                                        value: formData.shippingCity,
+                                        onChange: (e)=>handleCityInputChange(e, 'shipping'),
+                                        onBlur: (e)=>{
+                                            setTimeout(()=>setShowSuggestions(false), 200);
+                                            handleBlur(e);
+                                        },
+                                        className: getInputClassName('shippingCity'),
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 380,
+                                        columnNumber: 13
+                                    }, this),
+                                    showSuggestions && formData.shippingCountry === 'IN' && citySuggestions.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                        className: "absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto",
+                                        children: citySuggestions.map((city)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                className: "px-4 py-2 hover:bg-gray-100 cursor-pointer text-black",
+                                                onClick: ()=>handleCitySelect(city, 'shipping'),
+                                                children: city
+                                            }, city, false, {
+                                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                lineNumber: 395,
+                                                columnNumber: 19
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 393,
+                                        columnNumber: 15
+                                    }, this),
+                                    touched.shippingCity && errors.shippingCity && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-sm text-red-500",
+                                        children: errors.shippingCity
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 406,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 376,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "State"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 410,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "text",
+                                        name: "shippingState",
+                                        value: formData.shippingState,
+                                        onChange: handleShippingChange,
+                                        onBlur: handleBlur,
+                                        className: getInputClassName('shippingState'),
+                                        required: true,
+                                        readOnly: formData.shippingCountry === 'IN'
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 413,
+                                        columnNumber: 13
+                                    }, this),
+                                    touched.shippingState && errors.shippingState && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-sm text-red-500",
+                                        children: errors.shippingState
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 424,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 409,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "PIN Code"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 428,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "text",
+                                        name: "shippingPincode",
+                                        value: formData.shippingPincode,
+                                        onChange: (e)=>handlePincodeChange(e, 'shipping'),
+                                        onBlur: handleBlur,
+                                        className: getInputClassName('shippingPincode'),
+                                        maxLength: 6,
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 431,
+                                        columnNumber: 13
+                                    }, this),
+                                    touched.shippingPincode && errors.shippingPincode && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-sm text-red-500",
+                                        children: errors.shippingPincode
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 442,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 427,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                        lineNumber: 286,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                lineNumber: 283,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex items-center",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                        type: "checkbox",
+                        id: "sameAsShipping",
+                        checked: sameAsShipping,
+                        onChange: handleSameAsShippingChange,
+                        className: "h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                        lineNumber: 450,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                        htmlFor: "sameAsShipping",
+                        className: "ml-2 text-sm text-gray-700",
+                        children: "Billing address same as shipping"
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                        lineNumber: 457,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                lineNumber: 449,
+                columnNumber: 7
+            }, this),
+            !sameAsShipping && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$checkout$2f$BillingAddressForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                formData: formData,
+                handleChange: handleChange,
+                handleBlur: handleBlur,
+                getInputClassName: getInputClassName,
+                errors: errors,
+                touched: touched
+            }, void 0, false, {
+                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                lineNumber: 464,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "space-y-4",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                        className: "text-lg font-medium text-gray-900",
+                        children: "Payment Method"
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                        lineNumber: 476,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                type: "button",
+                                onClick: ()=>handlePaymentMethodChange('cod'),
+                                className: `flex items-center justify-between p-4 border rounded-lg ${formData.paymentMethod === 'cod' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex items-center gap-3",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$bi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BiMoney"], {
+                                                className: "w-6 h-6 text-gray-700"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                lineNumber: 490,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-left",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "font-medium text-gray-900",
+                                                        children: "Cash on Delivery"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                        lineNumber: 492,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-sm text-gray-500",
+                                                        children: "Extra ₹49 COD charges"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                        lineNumber: 493,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                lineNumber: 491,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 489,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: `w-4 h-4 rounded-full border-2 ${formData.paymentMethod === 'cod' ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 496,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 480,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                type: "button",
+                                onClick: ()=>handlePaymentMethodChange('razorpay'),
+                                className: `flex items-center justify-between p-4 border rounded-lg ${formData.paymentMethod === 'razorpay' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex items-center gap-3",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$fa6$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FaCreditCard"], {
+                                                className: "w-6 h-6 text-gray-700"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                lineNumber: 514,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-left",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "font-medium text-gray-900",
+                                                        children: "Pay Online"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                        lineNumber: 516,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-sm text-gray-500",
+                                                        children: "Cards, UPI, NetBanking"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                        lineNumber: 517,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                                lineNumber: 515,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 513,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: `w-4 h-4 rounded-full border-2 ${formData.paymentMethod === 'razorpay' ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                        lineNumber: 520,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                                lineNumber: 504,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                        lineNumber: 478,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                lineNumber: 475,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                type: "submit",
+                className: "w-full bg-gray-900 text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors",
+                children: formData.paymentMethod === 'cod' ? 'Place Order' : 'Proceed to Pay'
+            }, void 0, false, {
+                fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+                lineNumber: 530,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/checkout/CheckoutForm.tsx",
+        lineNumber: 281,
+        columnNumber: 5
+    }, this);
 }
 _s(CheckoutForm, "XbWh2qFgdX3F9km5VKN6lTXWh6g=");
 _c = CheckoutForm;

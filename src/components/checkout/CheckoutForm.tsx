@@ -129,6 +129,7 @@ export default function CheckoutForm() {
       
       return newState;
     });
+    validateField(name, value);  };
 
   const handleCityInputChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'shipping' | 'billing') => {
     const { value } = e.target;
@@ -534,4 +535,4 @@ export default function CheckoutForm() {
       </button>
     </form>
   );
-}}
+}
