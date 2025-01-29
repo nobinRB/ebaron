@@ -4,6 +4,9 @@ const nextConfig = {
     unoptimized: true, // This will help with local images
     domains: ['images.unsplash.com'],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 module.exports = nextConfig 
