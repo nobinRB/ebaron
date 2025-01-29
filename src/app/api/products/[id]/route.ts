@@ -2,14 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 
+type Props = {
+  params: {
+    id: string
+  }
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: Props
 ) {
   try {
     await connectDB();
 
-    const productId = params.id;
+    const productId = props.params.id;
     const product = await Product.findById(productId).lean().exec();
 
     if (!product) {
@@ -27,4 +33,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+}}
