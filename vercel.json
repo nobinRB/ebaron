@@ -1,7 +1,8 @@
 {
     "build": {
       "env": {
-        "TSC_COMPILE_ON_ERROR": "true"
+        "TSC_COMPILE_ON_ERROR": "true",
+        "MONGODB_URI": "mongodb+srv://ebaron:JSGHRSUGLhPTzFTy@ebaron.noqyl.mongodb.net/?retryWrites=true&w=majority&appName=ebaron"
       }
     },
     "functions": {
