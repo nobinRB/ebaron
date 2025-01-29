@@ -118,7 +118,7 @@ export default function CheckoutForm() {
       }
 
       // Handle other fields
-      newState[name as keyof typeof newState] = value;
+      newState[name as keyof typeof newState] = value as "cod" | "razorpay";
       
       if (sameAsShipping) {
         const billingField = name.replace('shipping', 'billing');
@@ -129,7 +129,6 @@ export default function CheckoutForm() {
       
       return newState;
     });
-    validateField(name, value);  };
 
   const handleCityInputChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'shipping' | 'billing') => {
     const { value } = e.target;
