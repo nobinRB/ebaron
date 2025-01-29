@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductGrid from '@/components/products/ProductGrid';
 import FilterSidebar from '@/components/filters/FilterSidebar';
 import { Product } from '@/types/product';
 
-export default function SearchPage() {
+// Separate component to handle search params
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q');
 
@@ -19,7 +20,6 @@ export default function SearchPage() {
           </aside>
           
           <div className="w-full md:w-5/6">
-            {/* Wrapping SearchResults in Suspense for async fetching */}
             <Suspense fallback={<div>Loading search results...</div>}>
               <SearchResults query={query} />
             </Suspense>
@@ -30,6 +30,16 @@ export default function SearchPage() {
   );
 }
 
+// Main component with Suspense boundary
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPageContent />
+    </Suspense>
+  );
+}
+
+// SearchResults component remains the same
 function SearchResults({ query }: { query: string | null }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
