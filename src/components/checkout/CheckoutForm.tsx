@@ -123,7 +123,7 @@ export default function CheckoutForm() {
       if (sameAsShipping) {
         const billingField = name.replace('shipping', 'billing');
         if (billingField !== name && billingField in newState) {
-          newState[billingField as keyof CheckoutFormData] = value;
+          newState[billingField as keyof CheckoutFormData] = value as "cod" | "razorpay";
         }
       }
       
