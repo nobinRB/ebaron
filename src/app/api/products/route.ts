@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
-// import type { IProduct } from '@/models/Product';
+import type { IProduct } from '@/models/Product';
 
 export async function GET() {
   try {
     console.log('Connecting to database...');
-    const mongoose = await connectDB();
+    const mongoose = await Promise.race([
+      connectDB(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database connection timeout')), 5000)
+      )
+    ]);
+
     if (!mongoose) {
       console.error('Database connection failed');
       return NextResponse.json(
@@ -16,24 +22,29 @@ export async function GET() {
     }
 
     console.log('Fetching products...');
-    const products = await Product.find({}).lean().exec();
+    const products: IProduct[] = await Promise.race([
+      Product.find({}).lean().exec(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Products fetch timeout')), 4000)
+      )
+    ]) as IProduct[];
     
     // Debug log to see what's in the database
-    products.forEach(product => {
-      console.log(`Product: ${product.name}, Image: ${product.imageUrl}`);
-    });
-    
-    if (!products || products.length === 0) {
+    if (products && products.length > 0) {
+      products.forEach(product => {
+        console.log(`Product: ${product.name}, Image: ${product.imageUrl}`);
+      });
+    } else {
+      console.log('No products found in database');
       return NextResponse.json([]);
     }
 
     return NextResponse.json(products);
   } catch (error) {
     console.error('Failed to fetch products:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fetch products' },
-      { status: 500 }
-    );
+    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch products';
+    const status = errorMessage.includes('timeout') ? 504 : 500;
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }
 

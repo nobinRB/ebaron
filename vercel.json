@@ -3,6 +3,11 @@
       "env": {
         "TSC_COMPILE_ON_ERROR": "true"
       }
+    },
+    "functions": {
+      "src/app/api/**/*.ts": {
+        "maxDuration": 10
+      }
     }
   }
   
