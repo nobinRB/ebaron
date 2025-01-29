@@ -1,12 +1,8 @@
 {
-  "build": {
-    "env": {
-      "TSC_COMPILE_ON_ERROR": "true"
-    }
-  },
-  "functions": {
-    "api/products.js": {
-      "maxDuration": 30
+    "build": {
+      "env": {
+        "TSC_COMPILE_ON_ERROR": "true"
+      }
     }
   }
-}
+  
