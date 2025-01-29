@@ -1491,7 +1491,7 @@ function CheckoutForm() {
     const handleRazorpayPayment = async ()=>{
         try {
             const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                key: ("TURBOPACK compile-time value", "rzp_test_IVwMVnHtaGTUWM"),
                 amount: 50000,
                 currency: "INR",
                 name: "Your Store Name",
