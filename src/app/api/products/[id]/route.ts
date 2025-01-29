@@ -1,17 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     await connectDB();
 
     const productId = params.id;
-
-    // Find the product by ID
     const product = await Product.findById(productId).lean().exec();
 
     if (!product) {
