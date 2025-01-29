@@ -76,13 +76,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }
   };
 
-  const handleBuyNow = () => {
-    if (selectedColor && selectedSize) {
-      updateCartQuantity(product, quantity, selectedColor, selectedSize);
-      router.push('/checkout');
-    }
-  };
-
   const discountPercentage = Math.round(
     ((product.originalPrice - product.price) / product.originalPrice) * 100
   );
