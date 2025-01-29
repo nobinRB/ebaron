@@ -2,16 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 
-interface RouteSegmentConfig {
-  params: {
-    id: string
-  }
-}
-
 export async function GET(
-  _request: NextRequest,
-  context: RouteSegmentConfig
-) {
+  request: NextRequest,
+  context: { params: { id: string } }
+): Promise<NextResponse> {
   try {
     await connectDB();
     const productId = context.params.id;
