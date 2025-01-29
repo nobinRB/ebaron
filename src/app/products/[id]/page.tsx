@@ -14,7 +14,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
-  const { updateCartQuantity, cartItems } = useCart();
+  const { updateCartQuantity } = useCart();
 
   // Updated mock product data with actual image paths
   const product = {
