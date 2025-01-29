@@ -7,8 +7,7 @@ interface IReview {
   createdAt: Date;
 }
 
-export interface IProduct extends Document {
-  _id: mongoose.Types.ObjectId;
+export interface IProductBase {
   name: string;
   description: string;
   price: number;
@@ -19,6 +18,10 @@ export interface IProduct extends Document {
   reviews: IReview[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IProduct extends Document, IProductBase {
+  _id: mongoose.Types.ObjectId;
 }
 
 const productSchema = new Schema<IProduct>({
